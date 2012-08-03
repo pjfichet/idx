@@ -141,7 +141,7 @@ if [ "$1" == "-d" ]; then
 	# default
 	# input: troff output
 	# output: troff format
-	sorter $1 | oneliner | troffer
+	sorter $2 | oneliner | troffer
 elif [ "$1" == "-h" ]; then
 	# print help
 	helper
@@ -149,7 +149,7 @@ elif [ "$1" == "-p" ]; then
 	# from pages
 	# input: handmade list of pages
 	# output: formatted index
-	spliter $1 | sorter | oneliner
+	spliter $2 | sorter | oneliner
 elif [ "$1" == "-r" ]; then
 	# reformat
 	# input: formatted index
@@ -159,7 +159,7 @@ elif [ "$1" == "-t" ]; then
 	# to troff
 	# input: manual list of pages
 	# output: troff format
-	spliter $1 | sorter | oneliner | troffer
+	spliter $2 | sorter | oneliner | troffer
 else
 	# default
 	# input: troff output
