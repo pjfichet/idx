@@ -1,44 +1,42 @@
 #!/bin/sh
 
-# input format
+# idx
+# simple tool to build indexes.
+
+# helper
+# print short usage
 helper() {
 echo -e "\033[1midx\033[0m: Format an index of words.
 
 \033[1mUsage\033[0m:
-    \033[1midx\033[0m [\033[1m-dhprt\033[0m] \033[1mfile\033[0m
+    \033[1midx\033[0m [\033[1m-dhprtw\033[0m] \033[1mfile\033[0m
 
 \033[1mOptions\033[0m:
-\033[1m-d\033[0m    Format from troff output to troff input (default).
+\033[1m-d\033[0m    From troff output to troff input (default).
 \033[1m-h\033[0m    Print this help.
-\033[1m-p\033[0m    Format an index from a list of pages.
-\033[1m-r\033[0m    Reformat a formatted index (fix errors).
-\033[1m-t\033[0m    Format from a list of pages to troff input.
+\033[1m-p\033[0m    From a list of words to a list of page.
+\033[1m-r\033[0m    Reformat a list of words (fix errors).
+\033[1m-t\033[0m    From a list of pages to troff input.
+\033[1m-w\033[0m    From a list of page to a list of words.
 
 \033[1mFormats\033[0m:
-Formatted index   word: page[, page]
+List of words     word: page[, page [, page-page]]
 List of pages     page: word[, word]
-Troff output      word: page
-Troff input       a list of macros
+Troff output      key> word: page
+Troff input:
+    .K<           \\\" one letter keyword defining the index
+    .ds <P x, m-n \\\" list of pages
+    .K> word word \\\" list of words to index
 
 See idx(1) for a more complete description."
 }
 
-#echo '
 #troff output format
-#.K< \" one letter keyword defining the index
-#.<L n N \" first letter of following indexed words
-#.<- \" begin entry
-#.	ds <1 word	\" word 1
-#.	ds <2 word	\" word 2
-#.	ds <n word	\" word n
-#.	nr <N x		\" number of words
-#.	ds <P y		\" list of pages
-#.K>	\" close entry
-# '
 
-
+# wordsorter
+# sort a list of words
 # Sort file by 1) words, 2) pages.
-sorter() {
+wordsorter() {
 	# -u: unique, -t: field separator,
 	# -f: ignore case, -V numeric order
 	#/usr/bin/sort -u -V $1
@@ -46,12 +44,20 @@ sorter() {
 	/usr/bin/sort -t : -k 1,1f -k 2,2V $1
 }
 
-# spliter:
+# pagesorter
+# sort a list of pages
+# Sort file by 1) page, 2) word.
+pagesorter() {
+	/usr/bin/sort -t : -k 1,1V -k 2,2f $1
+}
+
+# reverser
+# expand second field, and print it before the first one
 # input:	"page: word[, word]"
 # output:	"word: page\n[word: page]"
 # With:
 # words: array of indexed words
-spliter() {
+reverser() {
 /usr/bin/awk '
 BEGIN {FS = ": "}
 {
@@ -62,16 +68,17 @@ END {}
 ' $*
 }
 
-# oneliner
+# pager
+# concatenate pages
 # input: "word: page[\nword: page]"
-# output "word: page[, page]"
+# output "word: page[, page [, page-page]]"
 # Concatenate following pages if needed.
 # With:
 # term = previous list of words;
 # p = number of previous page;
 # f = - if it must concatenate list of pages;
 # r = 1 if it must print a \n (not on first line).
-oneliner() {
+pager() {
 /usr/bin/awk '
 BEGIN { FS = OFS = ": " }
 	$1 != term { if (f=="-") {printf("-%i", p); f=0};
@@ -89,14 +96,30 @@ END {
 ' $*
 }
 
+# worder
+# concatenate words
+# input: "page: word[\page: word]"
+# output "page: word[, word]"
+# page = previous page;
+# r = 1 if it must print a \n (not on first line).
+worder() {
+/usr/bin/awk '
+BEGIN { FS = OFS = ": " }
+	$1 == page { printf(", %s", $2) }
+	$1 != page { if (r==1) {printf("\n")}; r=1;
+				printf("%s: %s", $1, $2);  page=$1; }
+END { printf("\n") }
+' $*
+}
 
-# deindexer
+# expander
+# expand second field on different lines
 # input: "word: page[, page]"
 # output: word: page[\nword: page]"
 # With:
 # $1: word, pages: array of pages,
 # array: split continuous pages (3-7).
-deindexer() {
+expander() {
 /usr/bin/awk '
 BEGIN { FS = OFS = ": " }
 {
@@ -115,7 +138,24 @@ END {}
 ' $*
 }
 
+# keyer
+# insert a key at the begining of the line
+# if there's none.
+# input: "word: page[, page]"
+# output: "X> word: page[, page]"
+keyer() {
+/usr/bin/awk '
+BEGIN {FS = "> "}
+{
+	if ($2) { printf ("%s> %s\n", $1, $2) }
+	else { printf ("X> %s\n", $1) }
+}
+END {}
+' $*
+}
+
 # troffer 
+# output to troff
 # input: "word: page[, page]"
 # output: troff idx format
 # With:
@@ -125,45 +165,54 @@ troffer() {
 BEGIN {FS = ": "}
 {
 	split($1, macro, "> ");
-	if (macro[1]!=idx) {printf(".%s<\n", macro[1]); idx=macro[1]}
-	printf(".<-\n");
-	split(macro[2], entry, ", ");
-		for (i in entry) {printf(".	ds <%i %s\n", i, entry[i])};
-	printf(".	nr <N %i\n", i);
-	printf(".	ds <P %s\n", $2);
-	printf(".%s>\n", idx);
+	if (macro[1]!=idx) {printf(".\n.%s<\n", macro[1]); idx=macro[1]}
+	printf(".\n.ds <P %s\n", $2);
+	printf(".%s> %s\n", macro[1], macro[2]);
 }
 END {}
 ' $*
 }
 
+# look for args
+# -d from troff output to troff format (default)
+# -h help
+# -p from list of words to list of pages
+# -r reformat a list of words
+# -t from list of words to troff format
+# -w from list of page to list of words
 if [ "$1" == "-d" ]; then
 	# default
 	# input: troff output
 	# output: troff format
-	sorter $2 | oneliner | troffer
+	wordsorter $2 | pager | troffer
 elif [ "$1" == "-h" ]; then
 	# print help
 	helper
 elif [ "$1" == "-p" ]; then
-	# from pages
-	# input: handmade list of pages
-	# output: formatted index
-	spliter $2 | sorter | oneliner
+	# to page
+	# input: list of words
+	# output: list of pages
+	#pager $2 | wordsorter #| pager
+	expander $2 | reverser | pagesorter | worder
 elif [ "$1" == "-r" ]; then
 	# reformat
-	# input: formatted index
-	# output: formatted index
-	deindexer $2 | sorter | oneliner
+	# input: list of words
+	# output: list of words
+	expander $2 | wordsorter | pager
 elif [ "$1" == "-t" ]; then
 	# to troff
-	# input: manual list of pages
+	# input: list of words
 	# output: troff format
-	spliter $2 | sorter | oneliner | troffer
+	keyer $2 | expander | wordsorter | pager | troffer
+elif [ "$1" == "-w" ]; then
+	# to words
+	# input: list of pages
+	# output: list of words
+	reverser $2 | wordsorter | pager
 else
 	# default
 	# input: troff output
 	# output: troff format
-	sorter $1 | oneliner | troffer
+	wordsorter $1 | pager | troffer
 fi
 
