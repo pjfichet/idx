@@ -20,9 +20,9 @@ echo -e "\033[1midx\033[0m: Format an index of words.
 \033[1m-w\033[0m    From a list of page to a list of words.
 
 \033[1mFormats\033[0m:
-List of words     word: page[, page [, page-page]]
-List of pages     page: word[, word]
-Troff output      key> word: page
+List of words     word:: page[, page [, page-page]]
+List of pages     page:: word[, word]
+Troff output      key> word:: page
 Troff input:
     .K<           \\\" one letter keyword defining the index
     .ds <P x, m-n \\\" list of pages
@@ -36,30 +36,33 @@ See idx(1) for a more complete description."
 # wordsorter
 # sort a list of words
 # Sort file by 1) words, 2) pages.
+# sep is ":: " so, use first and third field
 wordsorter() {
 	# -u: unique, -t: field separator,
 	# -f: ignore case, -V numeric order
 	#/usr/bin/sort -u -V $1
 	#/usr/bin/sort -u -V -f $1
-	/usr/bin/sort -t : -k 1,1f -k 2,2V $1
+	/usr/bin/sort -t : -k 1,1f -k 3,3V $1
 }
 
 # pagesorter
 # sort a list of pages
 # Sort file by 1) page, 2) word.
+# sep is ":: " so, use first and third field
 pagesorter() {
-	/usr/bin/sort -t : -k 1,1V -k 2,2f $1
+	/usr/bin/sort -t : -k 1,1V -k 3,3f $1
+
 }
 
 # reverser
 # expand second field, and print it before the first one
-# input:	"page: word[, word]"
-# output:	"word: page\n[word: page]"
+# input:	"page:: word[, word]"
+# output:	"word:: page\n[word: page]"
 # With:
 # words: array of indexed words
 reverser() {
 /usr/bin/awk '
-BEGIN {FS = ": "}
+BEGIN {FS = ":: "}
 {
 	split($2, words, ", ");
 	for( i in words) { printf("%s: %s\n", words[i], $1)};
@@ -70,8 +73,8 @@ END {}
 
 # pager
 # concatenate pages
-# input: "word: page[\nword: page]"
-# output "word: page[, page [, page-page]]"
+# input: "word:: page[\nword: page]"
+# output "word:: page[, page [, page-page]]"
 # Concatenate following pages if needed.
 # With:
 # term = previous list of words;
@@ -80,10 +83,10 @@ END {}
 # r = 1 if it must print a \n (not on first line).
 pager() {
 /usr/bin/awk '
-BEGIN { FS = OFS = ": " }
+BEGIN { FS = OFS = ":: " }
 	$1 != term { if (f=="-") {printf("-%i", p); f=0};
 				if (r==1) {printf("\n")}; r=1;
-				printf("%s: ", $1); term=$1; p="99999"}
+				printf("%s:: ", $1); term=$1; p="99999"}
 	$2 < p { if (p!=99999) {printf(", ")};
 			printf("%i", $2); p=$2 }
 	$2 == p+1 { f="-"; p=$2 }
@@ -98,40 +101,40 @@ END {
 
 # worder
 # concatenate words
-# input: "page: word[\page: word]"
-# output "page: word[, word]"
+# input: "page:: word[\npage:: word]"
+# output "page:: word[, word]"
 # page = previous page;
 # r = 1 if it must print a \n (not on first line).
 worder() {
 /usr/bin/awk '
-BEGIN { FS = OFS = ": " }
+BEGIN { FS = OFS = ":: " }
 	$1 == page { printf(", %s", $2) }
 	$1 != page { if (r==1) {printf("\n")}; r=1;
-				printf("%s: %s", $1, $2);  page=$1; }
+				printf("%s:: %s", $1, $2);  page=$1; }
 END { printf("\n") }
 ' $*
 }
 
 # expander
 # expand second field on different lines
-# input: "word: page[, page]"
-# output: word: page[\nword: page]"
+# input: "word:: page[, page]"
+# output: word:: page[\nword: page]"
 # With:
 # $1: word, pages: array of pages,
 # array: split continuous pages (3-7).
 expander() {
 /usr/bin/awk '
-BEGIN { FS = OFS = ": " }
+BEGIN { FS = OFS = ":: " }
 {
 	split($2, pages, ", ");
 	for( i in pages) {
 		split(pages[i], array, "-");
 		if(array[2]) {
 			for(j=array[1]; j <= array[2]; j++) {
-				printf("%s: %s\n", $1, j);
+				printf("%s:: %s\n", $1, j);
 			}
 		}
-		else { printf("%s: %s\n", $1, array[1]) }
+		else { printf("%s:: %s\n", $1, array[1]) }
 	}
 }
 END {}
@@ -141,8 +144,8 @@ END {}
 # keyer
 # insert a key at the begining of the line
 # if there's none.
-# input: "word: page[, page]"
-# output: "X> word: page[, page]"
+# input: "word:: page[, page]"
+# output: "X> word:: page[, page]"
 keyer() {
 /usr/bin/awk '
 BEGIN {FS = "> "}
@@ -156,13 +159,13 @@ END {}
 
 # troffer 
 # output to troff
-# input: "word: page[, page]"
+# input: "word:: page[, page]"
 # output: troff idx format
 # With:
 # idx: actual index;
 troffer() {
 /usr/bin/awk '
-BEGIN {FS = ": "}
+BEGIN {FS = ":: "}
 {
 	split($1, macro, "> ");
 	if (macro[1]!=idx) {printf(".\n.%s<\n", macro[1]); idx=macro[1]}
