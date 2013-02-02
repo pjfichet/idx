@@ -65,7 +65,7 @@ reverser() {
 BEGIN {FS = ":: "}
 {
 	split($2, words, ", ");
-	for( i in words) { printf("%s: %s\n", words[i], $1)};
+	for( i in words) { printf("%s:: %s\n", words[i], $1)};
 }
 END {}
 ' $*
