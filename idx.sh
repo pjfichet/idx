@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id$
+# $Id: idx,v 0.7 2013/02/04 17:08:11 pj Exp $
 
 # helper
 # print short usage
@@ -171,6 +171,22 @@ END {}
 ' $*
 }
 
+# mixer
+# mix all entries in a single line,
+# even if they don't have the same keyword
+# input: list of lines
+# output: single line
+mixer() {
+/usr/bin/awk '
+BEGIN { FS = OFS = ":: " }
+{
+	printf( "mixed:: %s\n", $2);
+}
+END {}
+' $*
+}
+
+
 # keyer
 # insert a key at the begining of the line
 # if there's none.
@@ -221,6 +237,9 @@ if [ "$1" == "-d" ]; then
 elif [ "$1" == "-h" ]; then
 	# print help
 	helper
+elif [ "$1" == "-m" ]; then
+	# mix lines
+	mixer $2 | expander $2 | wordsorter | pager
 elif [ "$1" == "-p" ]; then
 	# to page
 	# input: list of words
