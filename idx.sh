@@ -31,11 +31,11 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.8 2013/03/07 20:04:12 pj Exp pj $
+# $Id: idx,v 0.9 2013/03/07 20:23:43 pj Exp pj $
 
-# helper
+# printhelp
 # print short usage
-helper() {
+printhelp() {
 echo -e "\033[1midx\033[0m: Format an index of words.
 
 \033[1mUsage\033[0m:
@@ -61,13 +61,12 @@ Troff input:
 See idx(1) for a more complete description."
 }
 
-#troff output format
 
-# wordsorter
+# sortwords
 # sort a list of words
 # Sort file by 1) words, 2) pages.
 # sep is ":: " so, use first and third field
-wordsorter() {
+sortwords() {
 	# -u: unique, -t: field separator,
 	# -f: ignore case, -V numeric order
 	#/usr/bin/sort -u -V $1
@@ -75,22 +74,21 @@ wordsorter() {
 	/usr/bin/sort -t : -k 1,1f -k 3,3V $1
 }
 
-# pagesorter
+# sortpages
 # sort a list of pages
 # Sort file by 1) page, 2) word.
 # sep is ":: " so, use first and third field
-pagesorter() {
+sortpages() {
 	/usr/bin/sort -t : -k 1,1V -k 3,3f $1
-
 }
 
-# reverser
+# invertfields
 # expand second field, and print it before the first one
-# input:	"page:: word[, word]"
-# output:	"word:: page\n[word: page]"
+# input:	"xxx:: yyy[, zzz]"
+# output:	"yyy:: xxx\n[zzz:: xxx]"
 # With:
 # words: array of indexed words
-reverser() {
+invertfields() {
 /usr/bin/awk '
 BEGIN {FS = ":: "}
 {
@@ -101,7 +99,7 @@ END {}
 ' $*
 }
 
-# pager
+# catpages
 # concatenate pages
 # input: "word:: page[\nword: page]"
 # output "word:: page[, page [, page-page]]"
@@ -111,7 +109,7 @@ END {}
 # p = number of previous page;
 # f = - if it must concatenate list of pages;
 # r = 1 if it must print a \n (not on first line).
-pager() {
+catpages() {
 /usr/bin/awk '
 BEGIN { FS = OFS = ":: " }
 	$1 != term { if (f=="-") {printf("-%i", p); f=0};
@@ -129,13 +127,13 @@ END {
 ' $*
 }
 
-# worder
+# catwords
 # concatenate words
 # input: "page:: word[\npage:: word]"
 # output "page:: word[, word]"
 # page = previous page;
 # r = 1 if it must print a \n (not on first line).
-worder() {
+catwords() {
 /usr/bin/awk '
 BEGIN { FS = OFS = ":: " }
 	$1 == page { printf(", %s", $2) }
@@ -145,14 +143,14 @@ END { printf("\n") }
 ' $*
 }
 
-# expander
+# splitpages
 # expand second field on different lines
 # input: "word:: page[, page]"
 # output: word:: page[\nword: page]"
 # With:
 # $1: word, pages: array of pages,
 # array: split continuous pages (3-7).
-expander() {
+splitpages() {
 /usr/bin/awk '
 BEGIN { FS = OFS = ":: " }
 {
@@ -171,12 +169,12 @@ END {}
 ' $*
 }
 
-# mixer
+# catlines
 # mix all entries in a single line,
 # even if they don't have the same keyword
 # input: list of lines
 # output: single line
-mixer() {
+catlines() {
 /usr/bin/awk '
 BEGIN { FS = OFS = ":: " }
 {
@@ -187,12 +185,12 @@ END {}
 }
 
 
-# keyer
+# addkeys
 # insert a key at the begining of the line
 # if there's none.
 # input: "word:: page[, page]"
 # output: "X> word:: page[, page]"
-keyer() {
+addkeys() {
 /usr/bin/awk '
 BEGIN {FS = "> "}
 {
@@ -203,13 +201,13 @@ END {}
 ' $*
 }
 
-# troffer 
+# totroff 
 # output to troff
 # input: "word:: page[, page]"
 # output: troff idx format
 # With:
 # idx: actual index;
-troffer() {
+totroff() {
 /usr/bin/awk '
 BEGIN {FS = ":: "}
 {
@@ -224,7 +222,7 @@ END {}
 
 # look for args
 # -d from troff output to troff format (default)
-# -h help
+# -h print help
 # -m mix lines
 # -p from list of words to list of pages
 # -r reformat a list of words
@@ -234,37 +232,37 @@ if [ "$1" == "-d" ]; then
 	# default
 	# input: troff output
 	# output: troff format
-	wordsorter $2 | pager | troffer
+	sortwords $2 | catpages | totroff
 elif [ "$1" == "-h" ]; then
 	# print help
-	helper
+	printhelp
 elif [ "$1" == "-m" ]; then
 	# mix lines
-	mixer $2 | expander $2 | wordsorter | pager
+	catlines $2 | splitpages | sortwords | catpages
 elif [ "$1" == "-p" ]; then
 	# to page
 	# input: list of words
 	# output: list of pages
-	expander $2 | reverser | pagesorter | worder
+	splitpages $2 | invertfields | sortpages | catwords
 elif [ "$1" == "-r" ]; then
 	# reformat
 	# input: list of words
 	# output: list of words
-	expander $2 | wordsorter | pager
+	splitpages $2 | sortwords | catpages
 elif [ "$1" == "-t" ]; then
 	# to troff
 	# input: list of words
 	# output: troff format
-	keyer $2 | expander | wordsorter | pager | troffer
+	addkeys $2 | splitpages | sortwords | catpages | totroff
 elif [ "$1" == "-w" ]; then
 	# to words
 	# input: list of pages
 	# output: list of words
-	reverser $2 | wordsorter | pager
+	invertfields $2 | sortwords | catpages
 else
 	# default
 	# input: troff output
 	# output: troff format
-	wordsorter $1 | pager | troffer
+	sortwords $1 | catpages | totroff
 fi
 
