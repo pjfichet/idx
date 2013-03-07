@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.7 2013/02/04 17:08:11 pj Exp $
+# $Id: idx,v 0.8 2013/03/07 20:04:12 pj Exp pj $
 
 # helper
 # print short usage
@@ -225,6 +225,7 @@ END {}
 # look for args
 # -d from troff output to troff format (default)
 # -h help
+# -m mix lines
 # -p from list of words to list of pages
 # -r reformat a list of words
 # -t from list of words to troff format
@@ -244,7 +245,6 @@ elif [ "$1" == "-p" ]; then
 	# to page
 	# input: list of words
 	# output: list of pages
-	#pager $2 | wordsorter #| pager
 	expander $2 | reverser | pagesorter | worder
 elif [ "$1" == "-r" ]; then
 	# reformat
