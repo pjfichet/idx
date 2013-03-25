@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.9 2013/03/07 20:23:43 pj Exp pj $
+# $Id: idx,v 0.10 2013/03/07 20:46:30 pj Exp pj $
 
 # printhelp
 # print short usage
@@ -44,6 +44,7 @@ echo -e "\033[1midx\033[0m: Format an index of words.
 \033[1mOptions\033[0m:
 \033[1m-d\033[0m    From troff output to troff input (default).
 \033[1m-h\033[0m    Print this help.
+\033[1m-m\033[0m    Mix all lines.
 \033[1m-p\033[0m    From a list of words to a list of page.
 \033[1m-r\033[0m    Reformat a list of words (fix errors).
 \033[1m-t\033[0m    From a list of pages to troff input.
