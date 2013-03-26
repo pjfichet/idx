@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.10 2013/03/07 20:46:30 pj Exp pj $
+# $Id: idx,v 0.11 2013/03/25 22:31:38 pj Exp pj $
 
 # printhelp
 # print short usage
@@ -264,6 +264,6 @@ else
 	# default
 	# input: troff output
 	# output: troff format
-	sortwords $1 | catpages | totroff
+	tr -d '\004' < $1 | sortwords | catpages | totroff
 fi
 
