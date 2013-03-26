@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.11 2013/03/25 22:31:38 pj Exp pj $
+# $Id: idx,v 0.12 2013/03/26 20:31:32 pj Exp pj $
 
 # printhelp
 # print short usage
@@ -42,7 +42,8 @@ echo -e "\033[1midx\033[0m: Format an index of words.
     \033[1midx\033[0m [\033[1m-dhprtw\033[0m] \033[1mfile\033[0m
 
 \033[1mOptions\033[0m:
-\033[1m-d\033[0m    From troff output to troff input (default).
+default:			From troff output to troff input.
+\033[1m-d\033[0m    From troff output to troff input, by deleting \\004.
 \033[1m-h\033[0m    Print this help.
 \033[1m-m\033[0m    Mix all lines.
 \033[1m-p\033[0m    From a list of words to a list of page.
@@ -230,10 +231,10 @@ END {}
 # -t from list of words to troff format
 # -w from list of page to list of words
 if [ "$1" == "-d" ]; then
-	# default
+	# to troff, by deleting \004
 	# input: troff output
 	# output: troff format
-	sortwords $2 | catpages | totroff
+	tr -d '\004' < $2 | sortwords | catpages | totroff
 elif [ "$1" == "-h" ]; then
 	# print help
 	printhelp
@@ -264,6 +265,6 @@ else
 	# default
 	# input: troff output
 	# output: troff format
-	tr -d '\004' < $1 | sortwords | catpages | totroff
+	sortwords $1 | catpages | totroff
 fi
 
