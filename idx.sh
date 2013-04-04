@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.12 2013/03/26 20:31:32 pj Exp pj $
+# $Id: idx,v 0.13 2013/03/26 21:12:39 pj Exp pj $
 
 # printhelp
 # print short usage
@@ -213,10 +213,12 @@ totroff() {
 /usr/bin/awk '
 BEGIN {FS = ":: "}
 {
+if ($1 != "" ) {
 	split($1, macro, "> ");
 	if (macro[1]!=idx) {printf(".\n.%s<\n", macro[1]); idx=macro[1]}
 	printf(".\n.ds <P %s\n", $2);
 	printf(".%s> %s\n", macro[1], macro[2]);
+}
 }
 END {}
 ' $*
