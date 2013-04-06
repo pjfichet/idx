@@ -31,7 +31,7 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.14 2013/04/04 10:54:23 pj Exp pj $
+# $Id: idx,v 0.15 2013/04/06 15:22:40 pj Exp pj $
 
 
 # printhelp
@@ -236,41 +236,42 @@ END {}
 # -r reformat a list of words
 # -t from list of words to troff format
 # -w from list of page to list of words
-if [ "$1" == "-d" ]; then
+case "$1" in
+
 	# to troff, by deleting \004
 	# input: troff output
 	# output: troff format
-	tr -d '\004' < $2 | sortwords | catpages | totroff
-elif [ "$1" == "-h" ]; then
+	"-d") tr -d '\004' < $2 | sortwords | catpages | totroff ;;
+
 	# print help
-	printhelp
-elif [ "$1" == "-m" ]; then
+	"-h") printhelp ;;
+
 	# mix lines
-	catlines $2 | splitpages | sortwords | catpages
-elif [ "$1" == "-p" ]; then
+	"-m") catlines $2 | splitpages | sortwords | catpages ;;
+
 	# to page
 	# input: list of words
 	# output: list of pages
-	splitpages $2 | invertfields | sortpages | catwords
-elif [ "$1" == "-r" ]; then
+	"-p") splitpages $2 | invertfields | sortpages | catwords ;;
+
 	# reformat
 	# input: list of words
 	# output: list of words
-	splitpages $2 | sortwords | catpages
-elif [ "$1" == "-t" ]; then
+	"-r") splitpages $2 | sortwords | catpages ;;
+
 	# to troff
 	# input: list of words
 	# output: troff format
-	addkeys $2 | splitpages | sortwords | catpages | totroff
-elif [ "$1" == "-w" ]; then
+	"-t") addkeys $2 | splitpages | sortwords | catpages | totroff ;;
+
 	# to words
 	# input: list of pages
 	# output: list of words
-	invertfields $2 | sortwords | catpages
-else
+	"-w") invertfields $2 | sortwords | catpages ;;
+
 	# default
 	# input: troff output
 	# output: troff format
-	sortwords $1 | catpages | totroff
-fi
+	*) sortwords $1 | catpages | totroff ;;
+esac
 
