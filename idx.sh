@@ -31,7 +31,8 @@
 # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 # THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# $Id: idx,v 0.13 2013/03/26 21:12:39 pj Exp pj $
+# $Id: idx,v 0.14 2013/04/04 10:54:23 pj Exp pj $
+
 
 # printhelp
 # print short usage
@@ -70,10 +71,11 @@ See idx(1) for a more complete description."
 # sep is ":: " so, use first and third field
 sortwords() {
 	# -u: unique, -t: field separator,
-	# -f: ignore case, -V numeric order
-	#/usr/bin/sort -u -V $1
-	#/usr/bin/sort -u -V -f $1
-	/usr/bin/sort -t : -k 1,1f -k 3,3V $1
+	# -f: ignore case, -V numeric version order
+	# -n numeric order
+	#sort -t: -k 1,1f -k 3,3V $1
+	sort -t: -k 1,1f -k 3,3n $1
+
 }
 
 # sortpages
@@ -81,7 +83,9 @@ sortwords() {
 # Sort file by 1) page, 2) word.
 # sep is ":: " so, use first and third field
 sortpages() {
-	/usr/bin/sort -t : -k 1,1V -k 3,3f $1
+	#sort -t: -k 1,1V -k 3,3f $1
+	sort -t: -k 1,1n -k 3,3f $1
+
 }
 
 # invertfields
@@ -91,7 +95,7 @@ sortpages() {
 # With:
 # words: array of indexed words
 invertfields() {
-/usr/bin/awk '
+awk '
 BEGIN {FS = ":: "}
 {
 	split($2, words, ", ");
@@ -112,7 +116,7 @@ END {}
 # f = - if it must concatenate list of pages;
 # r = 1 if it must print a \n (not on first line).
 catpages() {
-/usr/bin/awk '
+awk '
 BEGIN { FS = OFS = ":: " }
 	$1 != term { if (f=="-") {printf("-%i", p); f=0};
 				if (r==1) {printf("\n")}; r=1;
@@ -136,7 +140,7 @@ END {
 # page = previous page;
 # r = 1 if it must print a \n (not on first line).
 catwords() {
-/usr/bin/awk '
+awk '
 BEGIN { FS = OFS = ":: " }
 	$1 == page { printf(", %s", $2) }
 	$1 != page { if (r==1) {printf("\n")}; r=1;
@@ -153,7 +157,7 @@ END { printf("\n") }
 # $1: word, pages: array of pages,
 # array: split continuous pages (3-7).
 splitpages() {
-/usr/bin/awk '
+awk '
 BEGIN { FS = OFS = ":: " }
 {
 	split($2, pages, ", ");
@@ -177,7 +181,7 @@ END {}
 # input: list of lines
 # output: single line
 catlines() {
-/usr/bin/awk '
+awk '
 BEGIN { FS = OFS = ":: " }
 {
 	printf( "mixed:: %s\n", $2);
@@ -193,7 +197,7 @@ END {}
 # input: "word:: page[, page]"
 # output: "X> word:: page[, page]"
 addkeys() {
-/usr/bin/awk '
+awk '
 BEGIN {FS = "> "}
 {
 	if ($2) { printf ("%s> %s\n", $1, $2) }
@@ -210,7 +214,7 @@ END {}
 # With:
 # idx: actual index;
 totroff() {
-/usr/bin/awk '
+awk '
 BEGIN {FS = ":: "}
 {
 if ($1 != "" ) {
