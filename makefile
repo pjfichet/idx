@@ -2,7 +2,7 @@
 # Packaging directory
 DESTDIR=
 # Prefix directory
-PREFIX=/usr/local/
+PREFIX=/opt/utroff
 # Where to place binaries
 BINDIR=$(PREFIX)/bin
 # Where to place manuals
