@@ -1,15 +1,55 @@
-# Idx readme
-##############
+Idx - manipulate index files
+============================
+
 
 # Presentation
-==============
+--------------
 
 Idx is an helper tool to make and to manipulate index files. Idx
 has been made to automatically index troff document, but it can
 also be used manually, to make an index of a book.
 
+Options
+-------
+
+* -d
+Take troff output in entry, and output an index
+in a troff format. Internally used by troff
+macros to build indexes. This is the default.
+* -h
+Print a short help.
+* -m
+Mix all lines in a single line.
+* -p
+Take a list of words in entry, and output a list of pages.
+* -r
+Reformat a list of words to fix errors.
+* -t
+Take a list of pages in entry, and output an index in a
+troff format.
+* -w
+Take a list of pages in entry, and output a list of words.
+
+Short Example
+-------------
+
+Here is how I indexed the books I was reading for my thesis.
+- Read the book, and, annotate it to underline the words
+you’ll have to index.
+- On a file of your computer, write an index formatted as a
+list of pages: for each page of the book, write the words it
+contains.
+- Use idx to translate this file to a sorted list of words:
+	idx -w a.idx \fB>\fR b.idx
+- You should read this list of words, since you’ll probably
+have to correct some mistakes, or rename some index entry.
+- Once done, reformat it with idx:
+	idx -r b.idx \fB>\fR c.idx
+- Use idx to pass this formatted index to troff:
+	idx -t c.idx \fB|\fR troff \fB|\fR dpost \fB>\fR index.ps
+
 # Build
-=======
+-------
 
 To build and install idx and its manual page, run:
 
@@ -23,7 +63,7 @@ To uninstall and clean, run:
 
 
 # Compatibility with heirloom troff
-===================================
+-----------------------------------
 
 Idx is needed by utroff-utmac to build indexes. In that case, if
 heirloom troff is used, and if heirloom tools are in the begining
@@ -31,18 +71,18 @@ of the path, be sure that ’awk’ links to heirloom ’nawk’ and not
 heirloom ’oawk’.
 
 # License
-=========
+---------
 
 Idx and its man page are distributed under the ISC License.
 
 # Help and bugs
-===============
+---------------
 
 Don’t hesitate to ask questions at help at utroff dot org.
 Please, send bugs and patches at help at utroff dot org.
 
 # Author
-========
+--------
 
 Pierre-Jean Fichet.
 
