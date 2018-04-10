@@ -4,10 +4,26 @@
 .\" DS Utroff idx manual
 .\" DT Utroff idx manual
 .\" DK utroff idx troff nroff heirloom tmac xml
+.ig
+Copyright (C) 2012-2018 Pierre Jean Fichet
+<pierrejean dot fichet at posteo dot net>
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+..
 .
 .
 .
-.TH IDX 1 '2017‐11‐29'
+.TH IDX 1 '2018‐04-10'
 .
 .
 .
@@ -64,7 +80,7 @@ Take a list of pages in entry, and output a list of words.
 .
 .SH FORMAT
 .PP
-There’s four format of index file that \fIIdx\fR can work
+There are four formats of index file that \fIIdx\fR can work
 with: a list of pages, a list of words, troff output and
 troff input.
 .
@@ -238,17 +254,14 @@ not heirloom ’\fIoawk\fR’.
 .
 .SH LICENSE
 .PP
-\fIIdx\fR and this man page are distributed under a
-\&two clause BSD
-license.
+\fIIdx\fR and this man page are distributed under the ISC license.
 .
 .
 .
 .SH BUGS & HELP
 .PP
-Don’t hesitate to ask questions at help at utroff dot org.
-Please, send bugs and patches at help at utroff dot org.
-.
+Questions and bugs can be posted on
+<http://github.com/pjfichet/idx>.
 .
 .
 .SH AUTHOR
