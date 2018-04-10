@@ -1,0 +1,256 @@
+.\"
+.\" DI $Id: idx.tr,v 0.7 2014/03/21 09:16:06 pj Exp pj $
+.\" DA Pierre‐Jean Fichet
+.\" DS Utroff idx manual
+.\" DT Utroff idx manual
+.\" DK utroff idx troff nroff heirloom tmac xml
+.
+.
+.
+.TH IDX 1 '2017‐11‐29'
+.
+.
+.
+.SH NAME
+.PP
+\fBIdx\fR - make and manipulate index files.
+.
+.
+.
+.SH SYNOPSIS
+.PP
+\fB@BINDIR@/idx\fR
+[\fB-dhmprtw\fR]
+\fIfile\fR
+.
+.
+.
+.SH DESCRIPTION
+.PP
+\fIIdx\fR is an helper tool to make and to manipulate
+index files. \fIIdx\fR has been made to automatically index
+troff document, but it can also be used manually, to make an
+index of a book.
+.
+.
+.
+.SH OPTIONS
+.TP
+\&\fB-d\fR
+Take troff output in entry, and output an index
+in a troff format. Internally used by troff
+macros to build indexes. This is the default.
+.TP
+\&\fB-h\fR
+Print a short help.
+.TP
+\&\fB-m\fR
+Mix all lines in a single line.
+.TP
+\&\fB-p\fR
+Take a list of words in entry, and output a list of pages.
+.TP
+\&\fB-r\fR
+Reformat a list of words to fix errors.
+.TP
+\&\fB-t\fR
+Take a list of pages in entry, and output an index in a
+troff format.
+.TP
+\&\fB-w\fR
+Take a list of pages in entry, and output a list of words.
+.
+.
+.
+.SH FORMAT
+.PP
+There’s four format of index file that \fIIdx\fR can work
+with: a list of pages, a list of words, troff output and
+troff input.
+.
+.
+.
+.SS List of pages
+.RS 3
+.PP
+A list of pages indicates which words appears on a page.
+Each line of a list of pages is formatted as follow:
+.IP \(bu
+page number,
+.IP \(bu
+two semi‐colons followed by one space (:: ),
+.IP \(bu
+a list of words separated by a comma and a space (, ).
+.PP
+Example:
+.PP
+.EX
+\fB33::\fR troff, refer, index
+\fB34::\fR troff, index, nroff
+\fB35::\fR index, unix, refer
+.EE
+.
+.
+.
+.SS List of words
+.RS 3
+.PP
+A list of words indicates in which pages appears a word.
+Each line of a list of words is formatted as follow:
+.IP \(bu
+the word,
+.IP \(bu
+two semi‐colons followed by one space (:: ),
+.IP \(bu
+a list of page number or range of pages separated by a comma and
+a space (, ). A range of page is made by two page number
+separated by a tiret (‐).
+.PP
+The previous example would be formatted as follow:
+.PP
+.EX
+\fBindex::\fR 33-35
+\fBnroff::\fR 34
+\fBrefer::\fR 33, 35
+\fBtroff::\fR 33
+\fBunix::\fR 35
+.EE
+.
+.
+.
+.SS Troff output
+.RS 3
+.PP
+When \fIidx\fR is used to index a troff document, the output
+produced by troff and passed to idx should be as follow:
+.IP \(bu
+A single letter key which indicate what the index is
+about (W for index of words, T for index of titles...),
+.IP \(bu
+A ">" followed by a space (> ),
+.IP \(bu
+The indexed word,
+.IP \(bu
+Two semicolons followed by a space (:: ),
+.IP \(bu
+The page number where this word appears.
+.PP
+The previous example should be formatted as follow:
+.PP
+.EX
+\fBW> troff::\fR 33
+\fBW> refer::\fR 33
+\fBW> index::\fR 33
+\fBW> troff::\fR 34
+\fBW> index::\fR 33
+\fBW> nroff::\fR 34
+\fBW> index::\fR 35
+\fBW> unix::\fR 35
+\fBW> refer::\fR 35
+.EE
+.
+.
+.
+.SS Troff input
+.RS 3
+.PP
+\fIIdx\fR can format an index so that troff can print it
+correctly. The format of troff input is as follow:
+.PP
+.EX
+\fB.\fR\fBK<\fR                 \fI\Ee" one letter keyword defining the index\fR
+\fB.\fR\fBds\fR \fB<P\fR \fIx, m-n      \Ee" list of pages\fR
+\fB.\fR\fBK>\fR word            \fI\Ee" the word which appears on these pages\fR
+.EE
+.PP
+So, a troff macro that use idx should define the following
+macros:
+.TP
+\&\fBK<\fR
+Start an index of type K. Usually, such a macro will print a
+title, such as "Index of words".
+.TP
+\&\fBK>\fR
+Print the index entry defined as argument, followed by the
+list of pages previously defined by the \fB<P\fR string. You
+should add a dot at the end of the list of pages, since idx
+will not add it.
+.
+.
+.
+.SH EXAMPLE
+.PP
+This example taken from real life will show how to print an
+index of a paper book.
+.IP \(bu
+Read the book, and, annotate it to underline the words
+you’ll have to index.
+.IP \(bu
+On a file of your computer, write an index formatted as a
+list of pages: for each page of the book, write the words it
+contains.
+.IP \(bu
+Use idx to translate this file to a sorted list of words:
+.PP
+.EX
+idx -w a.idx \fB>\fR b.idx
+.EE
+.IP \(bu
+You should read this list of words, since you’ll probably
+have to correct some mistakes, or rename some index entry.
+.IP \(bu
+Once done, reformat it with idx:
+.PP
+.EX
+idx -r b.idx \fB>\fR c.idx
+.EE
+.IP \(bu
+Use idx to pass this formatted index to troff:
+.PP
+.EX
+idx -t c.idx \fB|\fR troff \fB|\fR dpost \fB>\fR index.ps
+.EE
+.
+.
+.
+.SH COMPATIBILITY
+.PP
+\fIIdx\fR is needed by
+\&utmac(7)
+to build indexes. In that case, if heirloom \fItroff\fR is
+used, and if heirloom tools are in the begining of the path,
+be sure that ’\fIawk\fR’ links to heirloom ’\fInawk\fR’ and
+not heirloom ’\fIoawk\fR’.
+.
+.
+.
+.SH FILES
+.PP
+\fI@BINDIR@/idx\fR
+.
+.
+.
+.SH SEE ALSO
+.PP
+\&utmac(7).
+.
+.
+.
+.SH LICENSE
+.PP
+\fIIdx\fR and this man page are distributed under a
+\&two clause BSD
+license.
+.
+.
+.
+.SH BUGS & HELP
+.PP
+Don’t hesitate to ask questions at help at utroff dot org.
+Please, send bugs and patches at help at utroff dot org.
+.
+.
+.
+.SH AUTHOR
+.PP
+Written by Pierre‐Jean Fichet.

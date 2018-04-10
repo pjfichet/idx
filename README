@@ -1,0 +1,49 @@
+# Idx readme
+##############
+
+# Presentation
+==============
+
+Idx is an helper tool to make and to manipulate index files. Idx
+has been made to automatically index troff document, but it can
+also be used manually, to make an index of a book.
+
+# Build
+=======
+
+To build and install idx and its manual page, run:
+
+    make
+    make install
+
+To uninstall and clean, run:
+
+    make uninstall
+    make clean
+
+
+# Compatibility with heirloom troff
+===================================
+
+Idx is needed by utroff-utmac to build indexes. In that case, if
+heirloom troff is used, and if heirloom tools are in the begining
+of the path, be sure that ’awk’ links to heirloom ’nawk’ and not
+heirloom ’oawk’.
+
+# License
+=========
+
+Idx and its man page are distributed under a two clause BSD
+license.
+
+# Help and bugs
+===============
+
+Don’t hesitate to ask questions at help at utroff dot org.
+Please, send bugs and patches at help at utroff dot org.
+
+# Author
+========
+
+Pierre-Jean Fichet.
+
