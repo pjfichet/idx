@@ -1,9 +1,4 @@
 .\"
-.\" DI $Id: idx.tr,v 0.7 2014/03/21 09:16:06 pj Exp pj $
-.\" DA Pierre‐Jean Fichet
-.\" DS Utroff idx manual
-.\" DT Utroff idx manual
-.\" DK utroff idx troff nroff heirloom tmac xml
 .ig
 Copyright (C) 2012-2018 Pierre Jean Fichet
 <pierrejean dot fichet at posteo dot net>
@@ -20,23 +15,27 @@ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
 ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ..
+.\" DA Pierre-Jean Fichet
+.\" DS Utroff idx manual
+.\" DT Utroff idx manual
+.\" DK utroff idx troff nroff heirloom tmac xml
 .
 .
 .
-.TH IDX 1 '2018‐04-10'
+.TH IDX 1 2018-04-14
 .
 .
 .
 .SH NAME
 .PP
-\fBIdx\fR - make and manipulate index files.
+\fBIdx\fR − make and manipulate index files.
 .
 .
 .
 .SH SYNOPSIS
 .PP
 \fB@BINDIR@/idx\fR
-[\fB-dhmprtw\fR]
+[\fB−dhmprtw\fR]
 \fIfile\fR
 .
 .
@@ -52,35 +51,35 @@ index of a book.
 .
 .SH OPTIONS
 .TP
-\&\fB-d\fR
+\&\fB−d\fR
 Take troff output in entry, and output an index
 in a troff format. Internally used by troff
 macros to build indexes. This is the default.
 .TP
-\&\fB-h\fR
+\&\fB−h\fR
 Print a short help.
 .TP
-\&\fB-m\fR
+\&\fB−m\fR
 Mix all lines in a single line.
 .TP
-\&\fB-p\fR
+\&\fB−p\fR
 Take a list of words in entry, and output a list of pages.
 .TP
-\&\fB-r\fR
+\&\fB−r\fR
 Reformat a list of words to fix errors.
 .TP
-\&\fB-t\fR
+\&\fB−t\fR
 Take a list of pages in entry, and output an index in a
 troff format.
 .TP
-\&\fB-w\fR
+\&\fB−w\fR
 Take a list of pages in entry, and output a list of words.
 .
 .
 .
 .SH FORMAT
 .PP
-There are four formats of index file that \fIIdx\fR can work
+There are four format of index file that \fIIdx\fR can work
 with: a list of pages, a list of words, troff output and
 troff input.
 .
@@ -94,7 +93,7 @@ Each line of a list of pages is formatted as follow:
 .IP \(bu
 page number,
 .IP \(bu
-two semi‐colons followed by one space (:: ),
+two semi-colons followed by one space (:: ),
 .IP \(bu
 a list of words separated by a comma and a space (, ).
 .PP
@@ -116,11 +115,11 @@ Each line of a list of words is formatted as follow:
 .IP \(bu
 the word,
 .IP \(bu
-two semi‐colons followed by one space (:: ),
+two semi-colons followed by one space (:: ),
 .IP \(bu
 a list of page number or range of pages separated by a comma and
 a space (, ). A range of page is made by two page number
-separated by a tiret (‐).
+separated by a tiret (-).
 .PP
 The previous example would be formatted as follow:
 .PP
@@ -174,9 +173,9 @@ The previous example should be formatted as follow:
 correctly. The format of troff input is as follow:
 .PP
 .EX
-\fB.\fR\fBK<\fR                 \fI\Ee" one letter keyword defining the index\fR
-\fB.\fR\fBds\fR \fB<P\fR \fIx, m-n      \Ee" list of pages\fR
-\fB.\fR\fBK>\fR word            \fI\Ee" the word which appears on these pages\fR
+\fB.\fR\fBK<\fR                 \fI\e" one letter keyword defining the index\fR
+\fB.\fR\fBds\fR \fB<P\fR \fIx, m-n      \e" list of pages\fR
+\fB.\fR\fBK>\fR word            \fI\e" the word which appears on these pages\fR
 .EE
 .PP
 So, a troff macro that use idx should define the following
@@ -200,7 +199,7 @@ This example taken from real life will show how to print an
 index of a paper book.
 .IP \(bu
 Read the book, and, annotate it to underline the words
-you’ll have to index.
+you'll have to index.
 .IP \(bu
 On a file of your computer, write an index formatted as a
 list of pages: for each page of the book, write the words it
@@ -212,7 +211,7 @@ Use idx to translate this file to a sorted list of words:
 idx -w a.idx \fB>\fR b.idx
 .EE
 .IP \(bu
-You should read this list of words, since you’ll probably
+You should read this list of words, since you'll probably
 have to correct some mistakes, or rename some index entry.
 .IP \(bu
 Once done, reformat it with idx:
@@ -232,11 +231,11 @@ idx -t c.idx \fB|\fR troff \fB|\fR dpost \fB>\fR index.ps
 .SH COMPATIBILITY
 .PP
 \fIIdx\fR is needed by
-\&utmac(7)
+utmac(7)
 to build indexes. In that case, if heirloom \fItroff\fR is
 used, and if heirloom tools are in the begining of the path,
-be sure that ’\fIawk\fR’ links to heirloom ’\fInawk\fR’ and
-not heirloom ’\fIoawk\fR’.
+be sure that '\fIawk\fR' links to heirloom '\fInawk\fR' and
+not heirloom '\fIoawk\fR'.
 .
 .
 .
@@ -248,22 +247,17 @@ not heirloom ’\fIoawk\fR’.
 .
 .SH SEE ALSO
 .PP
-\&utmac(7).
+utmac(7)
 .
 .
 .
 .SH LICENSE
 .PP
-\fIIdx\fR and this man page are distributed under the ISC license.
+\fIIdx\fR and this man page are distributed under the
+isc license
 .
-.
-.
-.SH BUGS & HELP
-.PP
-Questions and bugs can be posted on
-<http://github.com/pjfichet/idx>.
 .
 .
 .SH AUTHOR
 .PP
-Written by Pierre‐Jean Fichet.
+Written by Pierre-Jean Fichet.
