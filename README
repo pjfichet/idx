@@ -58,25 +58,10 @@ To uninstall and clean, run:
     make uninstall
     make clean
 
-
-# Compatibility with heirloom troff
------------------------------------
-
-Idx is needed by utroff-utmac to build indexes. In that case, if
-heirloom troff is used, and if heirloom tools are in the begining of
-the path, be sure that ’awk’ links to heirloom ’nawk’ and not heirloom
-’oawk’.
-
 # License
 ---------
 
 Idx and its man page are distributed under the ISC License.
-
-# Help and bugs
----------------
-
-Don’t hesitate to ask questions at help at utroff dot org.
-Please, send bugs and patches at help at utroff dot org.
 
 # Author
 --------
